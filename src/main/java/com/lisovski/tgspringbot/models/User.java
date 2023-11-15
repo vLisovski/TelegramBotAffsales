@@ -25,4 +25,7 @@ public class User {
 
     @Column(name = "state")
     private String state;
+
+    @Column(name = "aff_id")
+    private int aff_id;
 }

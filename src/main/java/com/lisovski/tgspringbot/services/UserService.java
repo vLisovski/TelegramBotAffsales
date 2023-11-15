@@ -24,7 +24,7 @@ public class UserService {
     }
 
     public int insert(User user){
-        return userRepository.insert(user.getChatId(),user.getToken(),user.getState());
+        return userRepository.insert(user.getChatId(),user.getToken(),user.getState(),user.getAff_id());
     }
 
     public void deleteById(int id){
@@ -35,4 +35,11 @@ public class UserService {
         return userRepository.updateStateByChatId(state, chatId);
     }
 
+    public int updateTokenByChatId(String token, long chatId){
+        return userRepository.updateTokenByChatId(token, chatId);
+    }
+
+    public int updateTokenAndStateAndIdByChatId(String token, String state, int id, long chatId){
+        return userRepository.updateTokenAndStateByChatId(token, state, id, chatId);
+    }
 }

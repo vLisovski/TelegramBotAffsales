@@ -30,15 +30,21 @@ public class Keyboards {
         replyKeyboardMarkup.setResizeKeyboard(true);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         List<KeyboardRow> keyboard = new ArrayList<>();
-        KeyboardRow keyboardFirstRow = new KeyboardRow();
 
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
         keyboardFirstRow.add("Получить пост");
-//        keyboardFirstRow.add(getForecastCommand(language));
-//        KeyboardRow keyboardSecondRow = new KeyboardRow();
-//        keyboardSecondRow.add(getSettingsCommand(language));
-//        keyboardSecondRow.add(getRateCommand(language));
+
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
+        keyboardSecondRow.add("Список офферов");
+        keyboardSecondRow.add("Список потоков");
+
+        KeyboardRow keyboardThirdRow = new KeyboardRow();
+        keyboardThirdRow.add("Создать поток");
+
         keyboard.add(keyboardFirstRow);
-//        keyboard.add(keyboardSecondRow);
+        keyboard.add(keyboardSecondRow);
+        keyboard.add(keyboardThirdRow);
+
         replyKeyboardMarkup.setKeyboard(keyboard);
 
         return replyKeyboardMarkup;

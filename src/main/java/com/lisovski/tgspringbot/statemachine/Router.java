@@ -25,6 +25,12 @@ public class Router {
                 return States.ASK_POST_ID;
             case "Рандомная паста":
                 return States.ANSWER_AUTH_DATA;
+            case "Список офферов":
+                return States.ASK_OFFER_ID_FOR_OFFERS;
+            case "Список потоков":
+                return States.ASK_OFFER_ID_FOR_FLOWS;
+            case "Создать поток":
+                return States.ASK_OFFER_ID_FOR_CREATE_FLOW;
             default:
                 return States.MAIN_MENU;
         }
@@ -37,14 +43,17 @@ public class Router {
                 User user = userService.getStateAndToken(chatId);
 
                 return routerMethodsLibrary.getMethodByState(user.getState())
-                        .getMessage(chatId, user.getToken(), messageText);
+                        .getMessage(chatId, user.getAff_id()+"-"+user.getToken(), messageText);
             } else {
+
                 int inserted = userService.insert(User.builder()
                         .chatId(chatId)
+                        .token("skibidi")
+                        .aff_id(0)
                         .state(States.ANSWER_AUTH_DATA.toString()).build());
 
                 return routerMethodsLibrary.getMethodByState(States.ANSWER_AUTH_DATA.toString())
-                        .getMessage(chatId, "", messageText);
+                        .getMessage(chatId, "skibidi", messageText);
             }
         } else {
 
@@ -52,17 +61,17 @@ public class Router {
 
             if (!user.getState().equals(States.MAIN_MENU.toString())) {
                 return routerMethodsLibrary.getMethodByState(user.getState())
-                        .getMessage(chatId, user.getToken(), messageText);
+                        .getMessage(chatId, user.getAff_id()+"-"+user.getToken(), messageText);
             } else {
 
                 States state = routeCallback(messageText);
 
                 if (state.toString().equals(States.MAIN_MENU.toString())) {
                     return routerMethodsLibrary.getMethodByState(user.getState())
-                            .getMessage(chatId, user.getToken(), messageText);
+                            .getMessage(chatId, user.getAff_id()+"-"+user.getToken(), messageText);
                 } else {
                     return routerMethodsLibrary.getMethodByState(state.toString())
-                            .getMessage(chatId, user.getToken(), messageText);
+                            .getMessage(chatId, user.getAff_id()+"-"+user.getToken(), messageText);
                 }
             }
         }

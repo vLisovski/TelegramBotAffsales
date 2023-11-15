@@ -12,4 +12,19 @@ public class ApiConfig {
 
     @Value("${api.post.getpost}")
     String getPostUrl;
+
+    @Value("${alter.createflow}")
+    String createFlowUrl;
+
+    @Value("${alter.flows}")
+    String getFlowsUrl;
+
+    @Value("${alter.offers}")
+    String getOffersUrl;
+
+    @Value("${alter.auth}")
+    String authUrl;
+
+    @Value("${alter.deleteflow}")
+    String deleteFlowUrl;
 }

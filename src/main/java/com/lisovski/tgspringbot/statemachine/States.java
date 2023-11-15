@@ -8,5 +8,20 @@ public enum States {
     MAIN_MENU,
 
     ASK_POST_ID,
-        GET_POST
+        GET_POST,
+
+    ASK_OFFER_ID_FOR_FLOWS,
+        GET_FLOWS,
+
+    ASK_OFFER_ID_FOR_OFFERS,
+        GET_OFFERS,
+
+    ASK_OFFER_ID_FOR_CREATE_FLOW,
+        CREATE_FLOW,
+
+    ASK_OFFER_ID_FOR_DELETE_FLOW,
+        DELETE_FLOW,
+
+    ASK_OFFER_ID_FOR_UPDATE_FLOW,
+        UPDATE_FLOW
 }

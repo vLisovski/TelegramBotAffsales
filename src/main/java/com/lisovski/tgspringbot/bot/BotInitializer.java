@@ -24,9 +24,9 @@ public class BotInitializer {
 
         try {
             telegramBotsApi.registerBot(bot);
-            System.out.println("бот зарегистрирован");
+            System.out.println("Имя и токен бота верны");
         } catch (TelegramApiException e) {
-            System.out.println("ошибка регистрации бота");
+            System.out.println("Ошибка. Имя и токен бота не верны или такой бот уже запущен.");
         }
     }
 }
