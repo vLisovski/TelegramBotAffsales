@@ -35,8 +35,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                             @Param(value = "chatId") long chatId);
 
     @Query(value = "UPDATE users SET token=:token,state=:state,aff_id=:aff_id WHERE chat_id=:chatId RETURNING 1", nativeQuery = true)
-    int updateTokenAndStateByChatId(@Param(value = "token") String token,
-                                    @Param(value = "state") String state,
-                                    @Param(value = "aff_id") int aff_id,
-                                    @Param(value = "chatId") long chatId);
+    int updateTokenAndStateAndAffIdByChatId(@Param(value = "token") String token,
+                                            @Param(value = "state") String state,
+                                            @Param(value = "aff_id") int aff_id,
+                                            @Param(value = "chatId") long chatId);
+
+    @Query(value = "UPDATE users SET token='skibidi',state='AUTH',aff_id=0 WHERE chat_id=:chatId RETURNING 1", nativeQuery = true)
+    int refreshUserByChatId(@Param(value = "chatId") long chatId);
 }

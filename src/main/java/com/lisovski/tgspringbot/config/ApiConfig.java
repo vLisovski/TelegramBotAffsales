@@ -27,4 +27,7 @@ public class ApiConfig {
 
     @Value("${alter.deleteflow}")
     String deleteFlowUrl;
+
+    @Value("${alter.updateflow}")
+    String updateFlowUrl;
 }
