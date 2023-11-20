@@ -23,6 +23,10 @@ public class UserService {
         return userRepository.existsByChatId(chatId);
     }
 
+    public boolean existsByToken(String token) {
+        return userRepository.existsByToken(token);
+    }
+
     public int insert(User user) {
         return userRepository.insert(user.getChatId(), user.getToken(), user.getState(), user.getAff_id());
     }

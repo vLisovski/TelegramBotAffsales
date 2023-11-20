@@ -30,4 +30,7 @@ public class ApiConfig {
 
     @Value("${alter.updateflow}")
     String updateFlowUrl;
+
+    @Value("${alter.stat}")
+    String statUrl;
 }

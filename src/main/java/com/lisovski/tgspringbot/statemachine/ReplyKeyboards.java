@@ -31,6 +31,9 @@ public class ReplyKeyboards {
         keyboardMap.put(States.ASK_OFFER_ID_FOR_OFFERS, askDataKeyboard());
         keyboardMap.put(States.ASK_OFFER_ID_FOR_FLOWS, askDataKeyboard());
         keyboardMap.put(States.ASK_FLOW_ID_FOR_DELETE_FLOW, askDataKeyboard());
+
+        keyboardMap.put(States.ASK_ITEM_FOR_STATISTIC, askItemForStatisticKeyboard());
+        keyboardMap.put(States.STATISTIC_FILTERS_MENU, statisticFiltersMenuKeyboard());
     }
 
     public ReplyKeyboardMarkup getKeyboardByState(States state) {
@@ -46,7 +49,7 @@ public class ReplyKeyboards {
         List<KeyboardRow> keyboard = new ArrayList<>();
 
         KeyboardRow keyboardFirstRow = new KeyboardRow();
-        keyboardFirstRow.add("Получить пост");
+        keyboardFirstRow.add("Статистика по кликам");
         keyboardFirstRow.add("Редактировать поток");
 
         KeyboardRow keyboardSecondRow = new KeyboardRow();
@@ -116,6 +119,74 @@ public class ReplyKeyboards {
         keyboardFirstRow.add("Назад");
 
         keyboard.add(keyboardFirstRow);
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
+        return replyKeyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup askItemForStatisticKeyboard(){
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        keyboardFirstRow.add("ID оффера");
+        keyboardFirstRow.add("ID потока");
+
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
+        keyboardSecondRow.add("utm_source");
+        keyboardSecondRow.add("utm_content");
+        keyboardSecondRow.add("utm_campaign");
+
+        KeyboardRow keyboardThirdRow = new KeyboardRow();
+        keyboardThirdRow.add("utm_term");
+        keyboardThirdRow.add("utm_medium");
+        keyboardThirdRow.add("Назад");
+
+        keyboard.add(keyboardFirstRow);
+        keyboard.add(keyboardSecondRow);
+        keyboard.add(keyboardThirdRow);
+
+        replyKeyboardMarkup.setKeyboard(keyboard);
+
+        return replyKeyboardMarkup;
+    }
+
+    private ReplyKeyboardMarkup statisticFiltersMenuKeyboard(){
+
+        ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+        replyKeyboardMarkup.setOneTimeKeyboard(false);
+
+        List<KeyboardRow> keyboard = new ArrayList<>();
+
+        KeyboardRow keyboardFirstRow = new KeyboardRow();
+        keyboardFirstRow.add("ID оффера");
+        keyboardFirstRow.add("ID потока");
+
+        KeyboardRow keyboardSecondRow = new KeyboardRow();
+        keyboardSecondRow.add("utm_source");
+        keyboardSecondRow.add("utm_content");
+        keyboardSecondRow.add("utm_campaign");
+
+        KeyboardRow keyboardThirdRow = new KeyboardRow();
+        keyboardThirdRow.add("utm_term");
+        keyboardThirdRow.add("utm_medium");
+
+        KeyboardRow keyboardFourthRow = new KeyboardRow();
+        keyboardFourthRow.add("В главное меню");
+        keyboardFourthRow.add("Получить статистику");
+
+        keyboard.add(keyboardFirstRow);
+        keyboard.add(keyboardSecondRow);
+        keyboard.add(keyboardThirdRow);
+        keyboard.add(keyboardFourthRow);
 
         replyKeyboardMarkup.setKeyboard(keyboard);
 

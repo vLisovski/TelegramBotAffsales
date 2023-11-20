@@ -80,11 +80,42 @@ public class AlterCPAWorker {
     public AuthAnswer auth(AuthRequest authRequest){
 
         String requestURL = apiConfig.getAuthUrl();
-        System.out.println(requestURL);
 
         return restTemplate.postForObject(requestURL, authRequest, AuthAnswer.class);
 
     }
 
+    public String getStatistic(String token, StatisticRequest statisticRequest){
 
+        String requestURL = apiConfig.getStatUrl() +"?id="+token +"&item="+statisticRequest.getItem();
+        if(!statisticRequest.getFrom().equals(" ")){
+            requestURL = requestURL+"&from="+statisticRequest.getFrom();
+        }
+        if(!statisticRequest.getTo().equals(" ")){
+            requestURL = requestURL+"&to="+statisticRequest.getTo();
+        }
+        if(statisticRequest.getOffer()!=0){
+            requestURL = requestURL+"&offer="+statisticRequest.getOffer();
+        }
+        if(statisticRequest.getFlow()!=0){
+            requestURL = requestURL+"&flow="+statisticRequest.getFlow();
+        }
+        if(statisticRequest.getUtms().equals(" ")){
+            requestURL = requestURL+"&utms="+statisticRequest.getUtms();
+        }
+        if(statisticRequest.getUtmc().equals(" ")){
+            requestURL = requestURL+"&utmc="+statisticRequest.getUtmc();
+        }
+        if(statisticRequest.getUtmn().equals(" ")){
+            requestURL = requestURL+"&utmn="+statisticRequest.getUtmn();
+        }
+        if(statisticRequest.getUtmt().equals(" ")){
+            requestURL = requestURL+"&utmt="+statisticRequest.getUtmt();
+        }
+        if(statisticRequest.getUtmm().equals(" ")){
+            requestURL = requestURL+"&utmm="+statisticRequest.getUtmm();
+        }
+
+        return restTemplate.getForObject(requestURL, String.class);
+    }
 }

@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query(value = "SELECT EXISTS(SELECT * FROM users WHERE chat_id=:chatId)", nativeQuery = true)
     boolean existsByChatId(@Param(value = "chatId")long chatId);
 
+    @Query(value = "SELECT EXISTS(SELECT * FROM users WHERE token=:token)", nativeQuery = true)
+    boolean existsByToken(@Param(value = "token")String token);
+
     void deleteById(int id);
 
     @Query(value = "INSERT INTO users (chat_id, token, state, aff_id) VALUES (:chatId,:token,:state,:aff_id) RETURNING *", nativeQuery = true)

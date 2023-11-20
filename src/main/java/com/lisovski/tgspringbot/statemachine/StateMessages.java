@@ -12,7 +12,6 @@ import com.lisovski.tgspringbot.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 
 import java.util.HashMap;
@@ -80,6 +79,37 @@ public class StateMessages {
         messageMap.put(States.ASK_FLOW_UTM_MEDIUM.toString(), this::askUtmMediumForUpdateFlow);
         messageMap.put(States.UPDATE_UTM_MEDIUM.toString(), this::updateFlowUtmMedium);
         messageMap.put(States.UPDATE_FLOW.toString(), this::updateFlow);
+        //get statistic
+        //ask statistic item
+        messageMap.put(States.ASK_ITEM_FOR_STATISTIC.toString(), this::askItemForStatistic);
+        messageMap.put(States.UPDATE_ITEM_FOR_STATISTIC.toString(), this::updateItemForStatistic);
+        messageMap.put(States.UPDATE_FROM.toString(), this::updateFromForStatistic);
+        messageMap.put(States.UPDATE_TO.toString(), this::updateToForStatistic);
+        //statistic filters menu
+        messageMap.put(States.STATISTIC_FILTERS_MENU.toString(), this::statisticFiltersMenu);
+        //update offer id for statistic filter
+        messageMap.put(States.ASK_OFFER_STAT.toString(), this::askOfferIdForStatisticFilter);
+        messageMap.put(States.UPDATE_OFFER_STAT.toString(), this::updateOfferIdForStatisticFilter);
+        //update flow id for statistic filter
+        messageMap.put(States.ASK_FLOW_STAT.toString(), this::askFlowIdForStatisticFilter);
+        messageMap.put(States.UPDATE_FLOW_STAT.toString(), this::updateFlowIdForStatisticFilter);
+        //update utm_source for statistic filter
+        messageMap.put(States.ASK_FLOW_UTM_SOURCE_STAT.toString(), this::askUtmSourceForStatisticFilter);
+        messageMap.put(States.UPDATE_UTM_SOURCE_STAT.toString(), this::updateUtmSourceForStatisticFilter);
+        //update utm_content for statistic filter
+        messageMap.put(States.ASK_FLOW_UTM_CONTENT_STAT.toString(), this::askUtmContentForStatisticFilter);
+        messageMap.put(States.UPDATE_UTM_CONTENT_STAT.toString(), this::updateUtmContentForStatisticFilter);
+        //update utm_campaign for statistic filter
+        messageMap.put(States.ASK_FLOW_UTM_CAMPAIGN_STAT.toString(), this::askUtmCampaignForStatisticFilter);
+        messageMap.put(States.UPDATE_UTM_CAMPAIGN_STAT.toString(), this::updateUtmCampaignForStatisticFilter);
+        //update utm_term for statistic filter
+        messageMap.put(States.ASK_FLOW_UTM_TERM_STAT.toString(), this::askUtmTermForStatisticFilter);
+        messageMap.put(States.UPDATE_UTM_TERM_STAT.toString(), this::updateUtmTermForStatisticFilter);
+        //update utm_medium for statistic filter
+        messageMap.put(States.ASK_FLOW_UTM_MEDIUM_STAT.toString(), this::askUtmMediumForStatisticFilter);
+        messageMap.put(States.UPDATE_UTM_MEDIUM_STAT.toString(), this::updateUtmMediumForStatisticFilter);
+        //get statistic
+        messageMap.put(States.GET_STATISTIC.toString(), this::getStatistic);
     }
 
     public Routable getMethodByState(String state) {
@@ -123,18 +153,24 @@ public class StateMessages {
                 authAnswer = new AuthAnswer();
                 authAnswer.setStatus("error");
                 sendMessage.setChatId(chatId);
-                sendMessage.setText("Ошибка. Превышено время ожидания ответа сервера.");
+                sendMessage.setText("Ошибка. Превышено время ожидания ответа сервера." +
+                        "\nВведите через пробел логин и пароль от личного кабинета AFFSALES, чтобы авторизоваться:");
                 return sendMessage;
             }
 
             if (authAnswer.getStatus().equals("ok")) {
 
                 sendMessage.setChatId(chatId);
-                sendMessage.setText("Вы успешно авторизованы, " + authAnswer.getName() + "!" + "\nВы в главном меню: ");
+                //проверяем, авторизован ли этот аккаунт в другом chatId
+                if(userService.existsByToken(authAnswer.getApi())){
+                    sendMessage.setText("Этот аккаунт уже авторизован в другом Telegram аккаунте. " +
+                            "\nВведите через пробел логин и пароль от личного кабинета AFFSALES, чтобы авторизоваться:");
+                    return sendMessage;
+                }
 
                 ReplyKeyboards replyKeyboards = new ReplyKeyboards();
                 sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.MAIN_MENU));
-                int i = userService.updateTokenAndStateAndIdByChatId(authAnswer.getApi(), States.MAIN_MENU.toString(), authAnswer.getId(), chatId);
+                userService.updateTokenAndStateAndIdByChatId(authAnswer.getApi(), States.MAIN_MENU.toString(), authAnswer.getId(), chatId);
 
             } else {
                 sendMessage.setChatId(chatId);
@@ -443,7 +479,7 @@ public class StateMessages {
         if (answer.getStatus().equals("ok")) {
             sendMessage.setText("Создан поток с id=" + answer.getId());
         } else {
-            sendMessage.setText("Ошибка создания потока. Описание ошибки: " + answer.getError()+ "\nВы в главном меню:");
+            sendMessage.setText("Ошибка создания потока. Описание ошибки: " + answer.getError() + "\nВы в главном меню:");
         }
 
         ReplyKeyboards replyKeyboards = new ReplyKeyboards();
@@ -503,7 +539,7 @@ public class StateMessages {
         if (answer.getStatus().equals("ok")) {
             sendMessage.setText("Поток успешно удалён");
         } else {
-            sendMessage.setText("Ошибка удаления потока. Описание ошибки: " + answer.getError()+ "\nВы в главном меню:");
+            sendMessage.setText("Ошибка удаления потока. Описание ошибки: " + answer.getError() + "\nВы в главном меню:");
         }
 
         ReplyKeyboards replyKeyboards = new ReplyKeyboards();
@@ -880,11 +916,555 @@ public class StateMessages {
         if (answer.getStatus().equals("ok")) {
             sendMessage.setText("Параметры потока успешно обновлены.\nВы в главном меню:");
         } else {
-            sendMessage.setText("Ошибка обновления параметров потока. Описание ошибки: " + answer.getError()+ "\nВы в главном меню:");
+            sendMessage.setText("Ошибка обновления параметров потока. Описание ошибки: " + answer.getError() + "\nВы в главном меню:");
         }
 
         ReplyKeyboards replyKeyboards = new ReplyKeyboards();
         sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.MAIN_MENU));
+
+        userService.updateStateByChatId(States.MAIN_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    //--------------------------------------------STATISTIC----------------------------------------------------------------
+    private SendMessage askItemForStatistic(long chatId, String token, String messageText) {
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Выберите поле, по которому следует сгрупировать статистику:");
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.ASK_ITEM_FOR_STATISTIC));
+
+        userService.updateStateByChatId(States.UPDATE_ITEM_FOR_STATISTIC.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private String convertToStringItem(String messageText) {
+
+        switch (messageText) {
+            case "ID оффера":
+                return "offer";
+            case "ID потока":
+                return "flow";
+            case "utm_source":
+                return "utms";
+            case "utm_content":
+                return "utmn";
+            case "utm_campaign":
+                return "utmc";
+            case "utm_term":
+                return "utmt";
+            case "utm_medium":
+                return "utmm";
+            default:
+                return "flow";
+        }
+
+    }
+
+    private SendMessage updateItemForStatistic(long chatId, String token, String messageText) {
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите дату в формате ГГГГ-ММ-ДД, от которой следует отобразить статистику. По умолчанию используется дата неделю назад.");
+
+        StatisticRequest statisticRequest = StatisticRequest.builder()
+                .item(convertToStringItem(messageText))
+                .from(" ")
+                .to(" ")
+                .offer(0)
+                .flow(0)
+                .utms(" ")
+                .utmc(" ")
+                .utmn(" ")
+                .utmt(" ")
+                .utmm(" ")
+                .build();
+
+        dataStorage.add(chatId, statisticRequest);
+
+        userService.updateStateByChatId(States.UPDATE_FROM.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateFromForStatistic(long chatId, String token, String messageText) {
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        sendMessage.setText("Введите дату в формате ГГГГ-ММ-ДД, до которой следует отобразить статистику. По умолчанию используется сегодняшний день.");
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        //TODO написать проверку на соответсвие формату ГГГГ-ММ-ДД
+        statisticRequest.setFrom(messageText);
+
+        userService.updateStateByChatId(States.UPDATE_TO.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateToForStatistic(long chatId, String token, String messageText) {
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        //TODO написать проверку на соответсвие формату ГГГГ-ММ-ДД
+        statisticRequest.setTo(messageText);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        return sendMessage;
+    }
+
+    private SendMessage statisticFiltersMenu(long chatId, String token, String messageText){
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        return sendMessage;
+    }
+
+    private SendMessage askOfferIdForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите id оффера, по которому нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_OFFER_STAT.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateOfferIdForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        int offerId;
+
+        try {
+            offerId = Integer.parseInt(messageText);
+        } catch (Exception e) {
+            sendMessage.setText("Введенный id не является целым числом." +
+                    "\nВведите id оффера, по которому нужно фильтровать статистику:");
+            return sendMessage;
+        }
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setOffer(offerId);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage askFlowIdForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите id потока, по которому нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_FLOW_STAT.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateFlowIdForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        int flowId;
+
+        try {
+            flowId = Integer.parseInt(messageText);
+        } catch (Exception e) {
+            sendMessage.setText("Введенный id не является целым числом." +
+                    "\nВведите id потока, по которому нужно фильтровать статистику:");
+            return sendMessage;
+        }
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setFlow(flowId);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage askUtmSourceForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите значение utm_source метки, по которой нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_UTM_SOURCE_STAT.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateUtmSourceForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setUtms(messageText);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage askUtmContentForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите значение utm_content метки, по которой нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_UTM_CONTENT_STAT.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateUtmContentForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setUtmn(messageText);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage askUtmCampaignForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите значение utm_campaign метки, по которой нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_UTM_CAMPAIGN_STAT.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateUtmCampaignForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setUtmc(messageText);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage askUtmTermForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите значение utm_term метки, по которой нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_UTM_TERM.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateUtmTermForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setUtmt(messageText);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage askUtmMediumForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+        sendMessage.setText("Введите значение utm_medium метки, по которой нужно фильтровать статистику:");
+
+        userService.updateStateByChatId(States.UPDATE_UTM_MEDIUM_STAT.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage updateUtmMediumForStatisticFilter(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        statisticRequest.setUtmm(messageText);
+
+        sendMessage.setText("Поле группировки: " + statisticRequest.getItem() + "\n"
+                + "От: " + statisticRequest.getFrom() + "\n"
+                + "До: " + statisticRequest.getTo() + "\n"
+                + "Фильтрация: ID оффера = " + statisticRequest.getOffer() + "\n"
+                + "Фильтрация: ID потока = " + statisticRequest.getFlow() + "\n"
+                + "Фильтрация: utm_source = " + statisticRequest.getUtms() + "\n"
+                + "Фильтрация: utm_content = " + statisticRequest.getUtmn() + "\n"
+                + "Фильтрация: utm_campaign = " + statisticRequest.getUtmc() + "\n"
+                + "Фильтрация: utm_term = " + statisticRequest.getUtmt() + "\n"
+                + "Фильтрация: utm_medium = " + statisticRequest.getUtmm() + "\n"
+                + "\nЗадайте фильтры, если требуется:"
+        );
+
+        ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+        sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.STATISTIC_FILTERS_MENU));
+
+        userService.updateStateByChatId(States.STATISTIC_FILTERS_MENU.toString(), chatId);
+
+        return sendMessage;
+    }
+
+    private SendMessage getStatistic(long chatId, String token, String messageText){
+
+        SendMessage sendMessage = new SendMessage();
+        sendMessage.setChatId(chatId);
+
+        StatisticRequest statisticRequest = (StatisticRequest) dataStorage.get(chatId);
+        String answer;
+
+        try {
+            answer = alterCPAWorker.getStatistic(token, statisticRequest);
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            sendMessage.setText("Ошибка. Превышено время ожидания ответа сервера.\nВы в главном меню:");
+
+            ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+            sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.MAIN_MENU));
+            sendMessage.setChatId(chatId);
+
+            userService.updateStateByChatId(States.MAIN_MENU.toString(), chatId);
+
+            return sendMessage;
+        }
+
+        if(answer.length()>0){
+            try {
+                Gson gson = new Gson();
+
+                Map<String, StatisticAnswer> statisticMap = gson.fromJson(answer, new TypeToken<HashMap<String, StatisticAnswer>>() {
+                }.getType());
+
+                StringBuilder stringBuilder = new StringBuilder();
+
+                statisticMap.forEach((key, value) -> {
+
+                    stringBuilder
+                            .append("ID элемента групировки: ")
+                            .append(value.getId())
+                            .append("\n")
+
+                            .append("Название элемента группировки(если применимо):")
+                            .append(value.getName())
+                            .append("\n")
+
+                            .append("Количество кликов: ")
+                            .append(value.getClicks())
+                            .append("\n")
+
+                            .append("Количество уникальных кликов: ")
+                            .append(value.getUnique())
+                            .append("\n")
+
+                            .append("Общее количество валидных лидов: ")
+                            .append(value.getCt())
+                            .append("\n")
+
+                            .append("Общая сумма по валидным лидам: ")
+                            .append(value.getMt())
+                            .append("\n")
+
+                            .append("Количество лидов в статусе «Принят»: ")
+                            .append(value.getCa())
+                            .append("\n")
+
+                            .append("Сумма по лидам в статусе «Принят»: ")
+                            .append(value.getMa())
+                            .append("\n")
+
+                            .append("Количество лидов в статусе «Ожидает»: ")
+                            .append(value.getCw())
+                            .append("\n")
+
+                            .append("Сумма по лидам в статусе «Ожидает»: ")
+                            .append(value.getMw())
+                            .append("\n")
+
+                            .append("Количество лидов в статусе «Отменён»: ")
+                            .append(value.getCc())
+                            .append("\n")
+                            .append("\n")
+                    ;
+                });
+
+                sendMessage.setText(stringBuilder.toString());
+
+            } catch (Exception e) {
+                System.out.println("Ошибка при парсинге статистики");
+                e.printStackTrace();
+                sendMessage.setText("Ошибка. Неудачный парсинг статистики(\nВы в главном меню:");
+            }
+
+            ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+            sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.MAIN_MENU));
+
+        }else{
+            ReplyKeyboards replyKeyboards = new ReplyKeyboards();
+            sendMessage.setReplyMarkup(replyKeyboards.getKeyboardByState(States.MAIN_MENU));
+            sendMessage.setText("Статистика по заданным параметрам отсутствует.\nВы в главном меню:");
+
+        }
 
         userService.updateStateByChatId(States.MAIN_MENU.toString(), chatId);
 
