@@ -34,6 +34,14 @@ public class ReplyKeyboards {
 
         keyboardMap.put(States.ASK_ITEM_FOR_STATISTIC, askItemForStatisticKeyboard());
         keyboardMap.put(States.STATISTIC_FILTERS_MENU, statisticFiltersMenuKeyboard());
+
+        keyboardMap.put(States.ASK_OFFER_STAT, askDataKeyboard());
+        keyboardMap.put(States.ASK_FLOW_STAT, askDataKeyboard());
+        keyboardMap.put(States.ASK_FLOW_UTM_SOURCE_STAT, askDataKeyboard());
+        keyboardMap.put(States.ASK_FLOW_UTM_CONTENT_STAT, askDataKeyboard());
+        keyboardMap.put(States.ASK_FLOW_UTM_CAMPAIGN_STAT, askDataKeyboard());
+        keyboardMap.put(States.ASK_FLOW_UTM_TERM_STAT, askDataKeyboard());
+        keyboardMap.put(States.ASK_FLOW_UTM_MEDIUM_STAT, askDataKeyboard());
     }
 
     public ReplyKeyboardMarkup getKeyboardByState(States state) {
@@ -180,7 +188,7 @@ public class ReplyKeyboards {
         keyboardThirdRow.add("utm_medium");
 
         KeyboardRow keyboardFourthRow = new KeyboardRow();
-        keyboardFourthRow.add("В главное меню");
+        keyboardFourthRow.add("Назад");
         keyboardFourthRow.add("Получить статистику");
 
         keyboard.add(keyboardFirstRow);

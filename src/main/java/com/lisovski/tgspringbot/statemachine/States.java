@@ -8,9 +8,6 @@ public enum States {
 
     MAIN_MENU,
 
-    ASK_POST_ID,
-        GET_POST,
-
     ASK_OFFER_ID_FOR_FLOWS,
         GET_FLOWS,
 
@@ -41,24 +38,22 @@ public enum States {
 
     ASK_ITEM_FOR_STATISTIC,
     UPDATE_ITEM_FOR_STATISTIC,
-    ASK_FROM,
     UPDATE_FROM,
-    ASK_TO,
     UPDATE_TO,
         STATISTIC_FILTERS_MENU,
             ASK_OFFER_STAT,
-            UPDATE_OFFER_STAT,
+                UPDATE_OFFER_STAT,
             ASK_FLOW_STAT,
-            UPDATE_FLOW_STAT,
+                UPDATE_FLOW_STAT,
             ASK_FLOW_UTM_SOURCE_STAT,
-            UPDATE_UTM_SOURCE_STAT,
+                UPDATE_UTM_SOURCE_STAT,
             ASK_FLOW_UTM_CONTENT_STAT,
-            UPDATE_UTM_CONTENT_STAT,
+                UPDATE_UTM_CONTENT_STAT,
             ASK_FLOW_UTM_CAMPAIGN_STAT,
-            UPDATE_UTM_CAMPAIGN_STAT,
+                UPDATE_UTM_CAMPAIGN_STAT,
             ASK_FLOW_UTM_TERM_STAT,
-            UPDATE_UTM_TERM_STAT,
+                UPDATE_UTM_TERM_STAT,
             ASK_FLOW_UTM_MEDIUM_STAT,
-            UPDATE_UTM_MEDIUM_STAT,
+                UPDATE_UTM_MEDIUM_STAT,
     GET_STATISTIC,
 }

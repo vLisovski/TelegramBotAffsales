@@ -29,31 +29,9 @@ public class AlterCPAWorker {
     }
 
     public UpdateFlowAnswer updateFlow(String token, UpdateFlowRequest updateFlowRequest){
-
         String requestURL = apiConfig.getUpdateFlowUrl()
-                +"?id="+token
-                +"&flow="+updateFlowRequest.getFlow();
-
-        if(!updateFlowRequest.getName().equals(" ")){
-            requestURL = requestURL + "&name=" + updateFlowRequest.getName();
-        }
-        if(!updateFlowRequest.getUtms().equals(" ")){
-            requestURL = requestURL + "&utms=" + updateFlowRequest.getUtms();
-        }
-        if(!updateFlowRequest.getUtmc().equals(" ")){
-            requestURL = requestURL + "&utmc=" + updateFlowRequest.getUtmc();
-        }
-        if(!updateFlowRequest.getUtmm().equals(" ")){
-            requestURL = requestURL + "&utmm=" + updateFlowRequest.getUtmm();
-        }
-        if(!updateFlowRequest.getUtmn().equals(" ")){
-            requestURL = requestURL + "&utmn=" + updateFlowRequest.getUtmn();
-        }
-        if(!updateFlowRequest.getUtmt().equals(" ")){
-            requestURL = requestURL + "&utmt=" + updateFlowRequest.getUtmt();
-        }
-
-        return restTemplate.getForObject(requestURL, UpdateFlowAnswer.class);
+                +"?id="+token;
+        return restTemplate.postForObject(requestURL,updateFlowRequest,UpdateFlowAnswer.class);
     }
 
     public String getFlows(String token, int offerId){

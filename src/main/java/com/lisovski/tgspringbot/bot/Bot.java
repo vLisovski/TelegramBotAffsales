@@ -16,6 +16,46 @@ public class Bot extends TelegramLongPollingBot {
     private final BotConfig botConfig;
     private final Router router;
 
+    private class SessionThread extends Thread {
+
+        private final Router router;
+        private final Update update;
+        private final TelegramLongPollingBot bot;
+
+        public SessionThread(Router router, Update update, TelegramLongPollingBot bot) {
+            this.router = router;
+            this.update = update;
+            this.bot = bot;
+        }
+
+        @Override
+        public void run(){
+
+            if (update.hasMessage() && update.getMessage().hasText()) {
+
+                SendMessage message = router.getAnswer(update.getMessage().getChatId()
+                        ,update.getMessage().getText());
+
+                try {
+                    execute(message);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+
+            } else if (update.hasCallbackQuery()) {
+
+                SendMessage message = router.getAnswer(update.getMessage().getChatId()
+                        ,update.getCallbackQuery().getMessage().getText());
+
+                try {
+                    bot.execute(message);
+                } catch (TelegramApiException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     @Override
     public String getBotUsername() {
         return botConfig.getBotName();
@@ -28,33 +68,7 @@ public class Bot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-
-//          SendMessage message = new SendMessage();
-//          message.setChatId(update.getMessage().getChatId());
-
-            SendMessage message = router.getAnswer(update.getMessage().getChatId(),update.getMessage().getText());
-
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-
-        } else if (update.hasCallbackQuery()) {
-
-            SendMessage message = router.getAnswer(update.getMessage().getChatId()
-                    ,update.getCallbackQuery().getMessage().getText());
-
-//            SendMessage message = new SendMessage();
-//            message.setChatId(update.getMessage().getChatId());
-//            message.setText("Callback!");
-
-            try {
-                execute(message);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-        }
+        SessionThread sessionThread = new SessionThread(router, update, this);
+        sessionThread.start();
     }
 }

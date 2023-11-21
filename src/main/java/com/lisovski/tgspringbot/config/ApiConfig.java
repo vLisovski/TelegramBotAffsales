@@ -10,9 +10,6 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("application.properties")
 public class ApiConfig {
 
-    @Value("${api.post.getpost}")
-    String getPostUrl;
-
     @Value("${alter.createflow}")
     String createFlowUrl;
 

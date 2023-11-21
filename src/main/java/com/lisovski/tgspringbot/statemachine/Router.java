@@ -25,8 +25,6 @@ public class Router {
             case "AUTH": return States.AUTH;
             case "LOGOUT": return States.LOGOUT;
             case "MAIN_MENU": return States.MAIN_MENU;
-            case "ASK_POST_ID": return States.ASK_POST_ID;
-            case "GET_POST": return States.GET_POST;
             case "ASK_OFFER_ID_FOR_FLOWS": return States.ASK_OFFER_ID_FOR_FLOWS;
             case "GET_FLOWS": return States.GET_FLOWS;
             case "ASK_OFFER_ID_FOR_OFFERS": return States.ASK_OFFER_ID_FOR_OFFERS;
@@ -76,18 +74,28 @@ public class Router {
 
     private States routeCallback(String callback, String currentState) {
         switch (callback) {
-            case "Получить пост":
-                return States.ASK_POST_ID;
             case "Статистика по кликам":
-                return States.ASK_ITEM_FOR_STATISTIC;
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.ASK_ITEM_FOR_STATISTIC;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             case "Редактировать поток":
-                return States.ASK_FLOW_ID_FOR_UPDATE_FLOW;
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.ASK_FLOW_ID_FOR_UPDATE_FLOW;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             case "Имя потока":
             {
                 if(currentState.equals("UPDATE_FLOW_MENU")){
                     return States.ASK_FLOW_NAME;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "ID оффера":
@@ -97,7 +105,7 @@ public class Router {
                 }else if(currentState.equals("STATISTIC_FILTERS_MENU")){
                     return States.ASK_OFFER_STAT;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "ID потока":
@@ -107,7 +115,7 @@ public class Router {
                 }else if(currentState.equals("STATISTIC_FILTERS_MENU")){
                     return States.ASK_FLOW_STAT;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "utm_source":
@@ -119,7 +127,7 @@ public class Router {
                 }else if(currentState.equals("UPDATE_ITEM_FOR_STATISTIC")){
                     return States.UPDATE_ITEM_FOR_STATISTIC;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "utm_content":
@@ -131,7 +139,7 @@ public class Router {
                 }else if(currentState.equals("UPDATE_ITEM_FOR_STATISTIC")){
                     return States.UPDATE_ITEM_FOR_STATISTIC;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "utm_campaign":
@@ -143,7 +151,7 @@ public class Router {
                 }else if(currentState.equals("UPDATE_ITEM_FOR_STATISTIC")){
                     return States.UPDATE_ITEM_FOR_STATISTIC;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "utm_term":
@@ -155,7 +163,7 @@ public class Router {
                 }else if(currentState.equals("UPDATE_ITEM_FOR_STATISTIC")){
                     return States.UPDATE_ITEM_FOR_STATISTIC;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "utm_medium":
@@ -167,7 +175,7 @@ public class Router {
                 }else if(currentState.equals("UPDATE_ITEM_FOR_STATISTIC")){
                     return States.UPDATE_ITEM_FOR_STATISTIC;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "Подтвердить":
@@ -175,7 +183,7 @@ public class Router {
                 if(currentState.equals("UPDATE_FLOW_MENU")){
                     return States.UPDATE_FLOW;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "Назад":
@@ -192,31 +200,54 @@ public class Router {
                     return States.MAIN_MENU;
                 }
             }
-            case "В главное меню":
-                if(currentState.equals("STATISTIC_FILTERS_MENU")){
-                    return States.MAIN_MENU;
-                }else{
-                    return parseState(currentState);
-                }
             case "Получить статистику":
             {
                 if(currentState.equals("STATISTIC_FILTERS_MENU")){
                     return States.GET_STATISTIC;
                 }else{
-                    return States.MAIN_MENU;
+                    return parseState(currentState);
                 }
             }
             case "Выйти из аккаунта":
-                return States.LOGOUT;
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.LOGOUT;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             case "Список офферов":
-                return States.ASK_OFFER_ID_FOR_OFFERS;
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.ASK_OFFER_ID_FOR_OFFERS;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             case "Список потоков":
-                return States.ASK_OFFER_ID_FOR_FLOWS;
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.ASK_OFFER_ID_FOR_FLOWS;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             case "Создать поток":
-                return States.ASK_OFFER_ID_FOR_CREATE_FLOW;
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.ASK_OFFER_ID_FOR_CREATE_FLOW;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             case "Удалить поток":
-                return States.ASK_FLOW_ID_FOR_DELETE_FLOW;
-
+            {
+                if(currentState.equals("MAIN_MENU")){
+                    return States.ASK_FLOW_ID_FOR_DELETE_FLOW;
+                }else{
+                    return parseState(currentState);
+                }
+            }
             default:
                 return States.MAIN_MENU;
         }
@@ -267,11 +298,11 @@ public class Router {
 
             if (!user.getState().equals(States.MAIN_MENU.toString()) && !user.getState().equals(States.UPDATE_FLOW_MENU.toString())
                     && !user.getState().equals(States.STATISTIC_FILTERS_MENU.toString())) {
-                System.out.println("IF BLOCK");
+
                 return stateMessages.getMethodByState(user.getState())
                         .getMessage(chatId, user.getAff_id()+"-"+user.getToken(), messageText);
             } else {
-                System.out.println("ELSE BLOCK");
+
                 States state = routeCallback(messageText, user.getState());
 
                 if (state.toString().equals(States.MAIN_MENU.toString())) {
