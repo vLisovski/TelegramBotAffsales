@@ -30,7 +30,6 @@ public class Bot extends TelegramLongPollingBot {
 
         @Override
         public void run(){
-
             if (update.hasMessage() && update.getMessage().hasText()) {
 
                 SendMessage message = router.getAnswer(update.getMessage().getChatId()
@@ -48,7 +47,7 @@ public class Bot extends TelegramLongPollingBot {
                         ,update.getCallbackQuery().getMessage().getText());
 
                 try {
-                    bot.execute(message);
+                    execute(message);
                 } catch (TelegramApiException e) {
                     e.printStackTrace();
                 }

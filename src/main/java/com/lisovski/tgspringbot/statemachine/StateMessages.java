@@ -267,13 +267,16 @@ public class StateMessages {
             }.getType());
 
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("\t").append("ID").append("\t").append("НАИМЕНОВАНИЕ").append("\n");
+            stringBuilder.append("ID").append("\t").append("НАИМЕНОВАНИЕ").append("\n");
 
             offerMap.forEach((key, value) -> {
-                stringBuilder.append("\t").append(value.getId()).append("\t").append(value.getName()).append("\n");
+                stringBuilder.append(value.getId()).append("\t").append(value.getName()).append("\n");
             });
 
-            sendMessage.setText(stringBuilder.toString());
+            String sendMessageText = stringBuilder.toString();
+            sendMessageText = sendMessageText.replaceAll("&#34;","\"");
+
+            sendMessage.setText(sendMessageText);
         } catch (Exception e) {
             System.out.println("Ошибка парсинга списка офферов.");
             e.printStackTrace();

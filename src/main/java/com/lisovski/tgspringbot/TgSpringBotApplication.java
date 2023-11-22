@@ -9,5 +9,6 @@ public class TgSpringBotApplication {
     //TODO запустить на сервере
     public static void main(String[] args){
         SpringApplication.run(TgSpringBotApplication.class, args);
+        System.out.println("Бот запущен");
     }
 }
